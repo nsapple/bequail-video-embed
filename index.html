@@ -10,7 +10,7 @@
     <button onclick="playVideo()">Play</button>
   </div>
 
-  <div id="videoContainer" style="display:none;"></div>
+  <div id="videoContainer" style="display:none; width:100vw; height:100vh; margin:0; padding:0;"></div>
 
   <script>
     function playVideo() {
@@ -39,12 +39,15 @@
       const frame = document.createElement('iframe');
       frame.src = embed;
       frame.allow = "autoplay; fullscreen; encrypted-media";
+      frame.frameBorder = "0";
       frame.width = "100%";
       frame.height = "100%";
-      frame.frameBorder = "0";
+      frame.style.margin = "0";
+      frame.style.padding = "0";
 
       const container = document.getElementById('videoContainer');
       container.appendChild(frame);
+
       document.getElementById('ui').style.display = 'none';
       container.style.display = 'block';
 
