@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Embedder</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 1rem;
+    }
+    input {
+      width: 60%;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      background: #ff0000;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    iframe {
+      width: 80%;
+      height: 60%;
+      border: none;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>YouTube Embedder</h1>
+  <input id="ytUrl" type="text" placeholder="Enter YouTube link..." />
+  <button onclick="embedVideo()">Play</button>
+  <div id="playerContainer"></div>
+
+  <script>
+    function embedVideo() {
+      const url = document.getElementById('ytUrl').value.trim();
+      if (!url) return;
+      try {
+        const videoId = new URL(url).searchParams.get('v');
+        if (!videoId) {
+          alert('Invalid YouTube URL');
+          return;
+        }
+        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`;
+        document.getElementById('playerContainer').innerHTML =
+          `<iframe src="${embedUrl}" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`;
+      } catch (err) {
+        alert('Invalid URL format');
+      }
+    }
+  </script>
+</body>
+</html>
