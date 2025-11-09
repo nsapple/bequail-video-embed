@@ -1,69 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>YouTube Embedder</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      gap: 1rem;
-    }
-    input {
-      width: 60%;
-      padding: 0.5rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 6px;
-      background: #ff0000;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    iframe {
-      width: 80%;
-      height: 60%;
-      border: none;
-      border-radius: 8px;
-      margin-top: 1rem;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>YouTube Fullscreen Player</title>
 </head>
 <body>
-  <h1>YouTube Embedder</h1>
-  <input id="ytUrl" type="text" placeholder="Enter YouTube link..." />
-  <button onclick="embedVideo()">Play</button>
-  <div id="playerContainer"></div>
+  <div id="ui">
+    <input id="ytUrl" type="text" placeholder="Paste YouTube link...">
+    <button onclick="playVideo()">Play</button>
+  </div>
+
+  <div id="videoContainer" style="display:none;"></div>
 
   <script>
-    function embedVideo() {
-      const url = document.getElementById('ytUrl').value.trim();
+    function playVideo() {
+      const input = document.getElementById('ytUrl');
+      const url = input.value.trim();
       if (!url) return;
+
+      let id;
       try {
-        const videoId = new URL(url).searchParams.get('v');
-        if (!videoId) {
-          alert('Invalid YouTube URL');
-          return;
+        id = new URL(url).searchParams.get('v');
+        if (!id) {
+          const match = url.match(/youtu\.be\/([A-Za-z0-9_-]+)/);
+          id = match ? match[1] : null;
         }
-        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`;
-        document.getElementById('playerContainer').innerHTML =
-          `<iframe src="${embedUrl}" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`;
-      } catch (err) {
-        alert('Invalid URL format');
+      } catch {
+        alert('Invalid YouTube URL');
+        return;
       }
+
+      if (!id) {
+        alert('Invalid YouTube URL');
+        return;
+      }
+
+      const embed = "https://www.youtube.com/embed/" + id + "?autoplay=1&playsinline=1";
+      const frame = document.createElement('iframe');
+      frame.src = embed;
+      frame.allow = "autoplay; fullscreen; encrypted-media";
+      frame.width = "100%";
+      frame.height = "100%";
+      frame.frameBorder = "0";
+
+      const container = document.getElementById('videoContainer');
+      container.appendChild(frame);
+      document.getElementById('ui').style.display = 'none';
+      container.style.display = 'block';
+
+      enterFullscreen(document.documentElement);
     }
+
+    function enterFullscreen(elem) {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    }
+
+    document.addEventListener("fullscreenchange", function() {
+      if (!document.fullscreenElement) {
+        enterFullscreen(document.documentElement);
+      }
+    });
   </script>
 </body>
 </html>
