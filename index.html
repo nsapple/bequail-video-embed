@@ -1,70 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>YouTube Fullscreen Player</title>
+<meta charset="UTF-8">
+<title>TV</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background: #111;
+    height: 100vh;
+    font-family: system-ui, sans-serif;
+  }
+  #ui {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 8px;
+  }
+  input {
+    width: 280px;
+    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background: #222;
+    color: #fff;
+    font-size: 14px;
+  }
+  input::placeholder {
+    color: #666;
+  }
+  input:focus {
+    outline: none;
+    border-color: #555;
+  }
+  button {
+    padding: 12px 20px;
+    background: #c00;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    background: #a00;
+  }
+  #videoContainer {
+    display: none;
+    position: fixed;
+    inset: 0;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    pointer-events: none;
+  }
+</style>
 </head>
 <body>
-  <div id="ui">
-    <input id="ytUrl" type="text" placeholder="Paste YouTube link...">
-    <button onclick="playVideo()">Play</button>
-  </div>
-
-  <div id="videoContainer" style="display:none; width:100vw; height:100vh; margin:0; padding:0;"></div>
-
-  <script>
-    function playVideo() {
-      const input = document.getElementById('ytUrl');
-      const url = input.value.trim();
-      if (!url) return;
-
-      let id;
-      try {
-        id = new URL(url).searchParams.get('v');
-        if (!id) {
-          const match = url.match(/youtu\.be\/([A-Za-z0-9_-]+)/);
-          id = match ? match[1] : null;
-        }
-      } catch {
-        alert('Invalid YouTube URL');
-        return;
-      }
-
-      if (!id) {
-        alert('Invalid YouTube URL');
-        return;
-      }
-
-      const embed = "https://www.youtube.com/embed/" + id + "?autoplay=1&playsinline=1";
-      const frame = document.createElement('iframe');
-      frame.src = embed;
-      frame.allow = "autoplay; fullscreen; encrypted-media";
-      frame.frameBorder = "0";
-      frame.width = "100%";
-      frame.height = "100%";
-      frame.style.margin = "0";
-      frame.style.padding = "0";
-
-      const container = document.getElementById('videoContainer');
-      container.appendChild(frame);
-
-      document.getElementById('ui').style.display = 'none';
-      container.style.display = 'block';
-
-      enterFullscreen(document.documentElement);
+<div id="ui">
+  <input id="ytUrl" type="text" placeholder="Paste YouTube URL">
+  <button onclick="playVideo()">Play</button>
+</div>
+<div id="videoContainer"></div>
+<script>
+function playVideo() {
+  const url = document.getElementById("ytUrl").value.trim();
+  let id = null;
+  try {
+    id = new URL(url).searchParams.get("v");
+    if (!id) {
+      const match = url.match(/youtu\.be\/([A-Za-z0-9_-]+)/);
+      id = match ? match[1] : null;
     }
-
-    function enterFullscreen(elem) {
-      if (elem.requestFullscreen) elem.requestFullscreen();
-      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-    }
-
-    document.addEventListener("fullscreenchange", function() {
-      if (!document.fullscreenElement) {
-        enterFullscreen(document.documentElement);
-      }
-    });
-  </script>
+  } catch {}
+  if (!id) {
+    alert("Invalid YouTube URL");
+    return;
+  }
+  const container = document.getElementById("videoContainer");
+  container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&controls=0&rel=0&modestbranding=1&disablekb=1&playsinline=1"></iframe>`;
+  document.getElementById("ui").style.display = "none";
+  container.style.display = "block";
+}
+document.getElementById("ytUrl").addEventListener("keydown", e => {
+  if (e.key === "Enter") playVideo();
+});
+</script>
 </body>
 </html>
